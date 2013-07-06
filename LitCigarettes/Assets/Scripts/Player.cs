@@ -4,28 +4,24 @@ using System.Collections;
 public class Player : MonoBehaviour {
 	
 	//Movement
-	CharacterController controller;
-	public int moveSpeed;
-	public Vector3 moveDirection;
-	public int jumpSpeed;
-	public float gravitySpeed;
-	public float ySpeed;
+		CharacterController controller;
+		public Vector3 moveDirection;//private
+		public int moveSpeed;
+		public int jumpSpeed;
+		public float ySpeed;//private
+		public float gravitySpeed;
 	//Camera Control
-	public int rotateSpeed;
+		public int rotateSpeed;
 		//Up/Down
-			public float cameraV;//how much are we currently rotating
+			public float cameraV;//how much are we currently rotating (private)
 			float cameraRotationV;
 			public float minCameraV;
 			public float maxCameraV;
 		//Left/Right
-			public float cameraH;
+			public float cameraH;	
 	
-	
-	
-	
-	
-
-	
+	//GameObjects
+		public GameObject model;
 	
 	// Use this for initialization
 	void Start () 
@@ -36,9 +32,10 @@ public class Player : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () 
 	{
-		//MovementInput();
 		Movement();
 		MouseInput();
+		if(Input.GetKey(KeyCode.R))
+			Application.LoadLevel(Application.loadedLevel);
 		if (Input.GetKeyDown(KeyCode.Escape))
         	Screen.lockCursor = false;
 		//transform.Translate(moveDirection*Time.deltaTime);
@@ -56,6 +53,7 @@ public class Player : MonoBehaviour {
 	{
 		if(Input.GetMouseButtonDown(0))
 		{
+			PlayAnimation("Throw",1);
 			Screen.lockCursor = true;
 			Screen.showCursor = false;
 		}
@@ -101,6 +99,16 @@ public class Player : MonoBehaviour {
         moveDirection = transform.TransformDirection(moveDirection);
         moveDirection *= moveSpeed;	
 		moveDirection = new Vector3(moveDirection.x,ySpeed,moveDirection.z);
+		if(Input.GetAxis("Vertical") > 0 || Input.GetAxis("Horizontal") != 0)
+		{
+			if(!model.animation["Throw"].enabled)
+				PlayAnimation("Walk",.7f);
+		}
+		else
+		{
+			if(!model.animation["Throw"].enabled)
+				PlayAnimation("Idle",1);
+		}
 		if(controller.isGrounded)
 		{
 			if(Input.GetButton("Jump"))
@@ -116,5 +124,11 @@ public class Player : MonoBehaviour {
 			if(ySpeed > -9.8)
 				ySpeed += gravitySpeed;
 		}
+	}
+	
+	void PlayAnimation(string name,float speed)
+	{
+		model.animation[name].speed = speed;
+		model.animation.Play(name);
 	}
 }
