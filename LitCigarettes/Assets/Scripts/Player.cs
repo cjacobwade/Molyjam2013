@@ -7,9 +7,17 @@ public class Player : MonoBehaviour {
 		CharacterController controller;
 		public Vector3 moveDirection;//private
 		public int moveSpeed;
-		public int jumpSpeed;
 		public float ySpeed;//private
 		public float gravitySpeed;
+		//Jumping
+			public int jumpSpeed;
+			bool isJumping = false;
+		//Crouching
+			public float crouchSpeed;
+			public float crouchMoveSpeed;
+			public float crouchHeight;
+			float controllerHeight;
+			bool isCrouching = false;
 	//Camera Control
 		public int rotateSpeed;
 		//Up/Down
@@ -97,12 +105,22 @@ public class Player : MonoBehaviour {
 		//Horizontal and Vertical axis are controlled by wasd or arrows
 		moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0,Input.GetAxis("Vertical"));
         moveDirection = transform.TransformDirection(moveDirection);
-        moveDirection *= moveSpeed;	
+		if(isCrouching)
+			moveDirection *= crouchMoveSpeed;
+		else
+        	moveDirection *= moveSpeed;	
 		moveDirection = new Vector3(moveDirection.x,ySpeed,moveDirection.z);
 		if(Input.GetAxis("Vertical") > 0 || Input.GetAxis("Horizontal") != 0)
 		{
-			if(!model.animation["Throw"].enabled)
-				PlayAnimation("Walk",.7f);
+			if(!model.animation["Throw"].enabled && !isJumping)
+			{
+				if(isCrouching)
+					PlayAnimation("Walk",.2f);
+				else
+					PlayAnimation("Walk",.4f);
+			}
+			else
+				model.animation.Stop("Walk");
 		}
 		else
 		{
@@ -111,18 +129,44 @@ public class Player : MonoBehaviour {
 		}
 		if(controller.isGrounded)
 		{
-			if(Input.GetButton("Jump"))
-			{
-				ySpeed = 0;
-				ySpeed += jumpSpeed;
-			}
-			else
-				moveDirection.y = 0;
+			isJumping = false;
+			Jump();
+			Crouch();
 		}
 		else
 		{
 			if(ySpeed > -9.8)
 				ySpeed += gravitySpeed;
+		}
+	}
+	
+	void Jump()
+	{
+		if(Input.GetButton("Jump"))
+		{
+			//isCrouching = false;
+			isJumping = true;
+			ySpeed = 0;
+			ySpeed += jumpSpeed;
+		}
+		else
+			moveDirection.y = 0;
+	}
+	
+	void Crouch()
+	{
+		if(Input.GetKey(KeyCode.LeftShift))
+		{
+			isCrouching = true;
+			if(controller.height > crouchHeight)
+				controller.height -= crouchSpeed*Time.deltaTime;
+		}
+		if(!Input.GetKey(KeyCode.LeftShift) && isCrouching)
+		{
+			ySpeed = 0;
+			ySpeed += jumpSpeed/1.7f;
+			controller.height = 1.7f;
+			isCrouching = false;
 		}
 	}
 	
