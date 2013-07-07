@@ -9,7 +9,11 @@ public class Player : MonoBehaviour {
 		public int moveSpeed;
 		public float ySpeed;//private
 		public float gravitySpeed;
-		bool isMoving = false;
+		//Throwing
+			public float throwTime;
+			public float reloadTime;
+			public int spikeSpeed;
+			bool throwReady = true;
 		//Jumping
 			public int jumpSpeed;
 			public float maxJump;
@@ -42,6 +46,8 @@ public class Player : MonoBehaviour {
 	//GameObjects
 		public GameObject view;
 		public GameObject model;
+		public GameObject spike;
+		public GameObject hand;
 	
 	// Use this for initialization
 	void Start () 
@@ -71,9 +77,14 @@ public class Player : MonoBehaviour {
 	
 	void LeftMouse()
 	{
-		if(Input.GetMouseButtonDown(0))
+		if(Input.GetMouseButton(0))
 		{
-			PlayAnimation("Throw",1);
+			if(throwReady)
+			{
+				PlayAnimation("Throw",1.3f);
+				StartCoroutine(Throw(throwTime,reloadTime));
+				throwReady = false;
+			}
 			Screen.lockCursor = true;
 			Screen.showCursor = false;
 		}
@@ -163,14 +174,19 @@ public class Player : MonoBehaviour {
 			}
 		}
 		else
-			if(audio.clip.name != "Landing")
+		{
+			if(audio.clip != sounds[2])
 				audio.Stop();
+		}
 	}
 	
 	void Dying()
 	{
 		if(jumpTime < maxJump)
-			jumpTime += 1*Time.deltaTime;
+		{
+			if(moveDirection.y < 0)
+				jumpTime += Time.deltaTime;
+		}
 		else
 		{
 			
@@ -187,14 +203,6 @@ public class Player : MonoBehaviour {
 			}
 			
 		}
-	}
-	
-	IEnumerator Death(float waitTime)
-	{
-		yield return new WaitForSeconds(waitTime);
-		brighten = true;
-		yield return new WaitForSeconds(waitTime*.3f);
-		Application.LoadLevel(Application.loadedLevel);
 	}
 	
 	void Jump()
@@ -226,6 +234,26 @@ public class Player : MonoBehaviour {
 			controller.height = 1.7f;
 			isCrouching = false;
 		}
+	}
+	
+	IEnumerator Death(float waitTime)
+	{
+		yield return new WaitForSeconds(waitTime);
+		brighten = true;
+		yield return new WaitForSeconds(waitTime*.3f);
+		Application.LoadLevel(Application.loadedLevel);
+	}
+	
+	IEnumerator Throw(float waitTime,float waitTime2)
+	{
+		print (1);
+		yield return new WaitForSeconds(waitTime);
+		print (2);
+		GameObject newSpike = Instantiate(spike,hand.transform.position,view.transform.rotation) as GameObject;
+		newSpike.transform.rigidbody.AddForce(newSpike.transform.forward*spikeSpeed*10);
+		yield return new WaitForSeconds(waitTime2);
+		throwReady = true;
+		
 	}
 	
 	void PlayAnimation(string name,float speed)
