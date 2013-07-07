@@ -69,6 +69,8 @@ ModelImporter:
     100126: pPlane11
     100128: polySurface47
     100130: polySurface51
+    100132: pCube2
+    100134: pPlane12
     400000: //RootNode
     400002: pCylinder1
     400004: pCylinder2
@@ -135,6 +137,8 @@ ModelImporter:
     400126: pPlane11
     400128: polySurface47
     400130: polySurface51
+    400132: pCube2
+    400134: pPlane12
     2300000: pCylinder1
     2300002: pCylinder2
     2300004: polySurface11
@@ -154,6 +158,8 @@ ModelImporter:
     2300032: pPlane11
     2300034: polySurface47
     2300036: polySurface51
+    2300038: pCube2
+    2300040: pPlane12
     3300000: pCylinder1
     3300002: pCylinder2
     3300004: polySurface11
@@ -173,6 +179,8 @@ ModelImporter:
     3300032: pPlane11
     3300034: polySurface47
     3300036: polySurface51
+    3300038: pCube2
+    3300040: pPlane12
     4300000: pPlane1
     4300002: pPlane2
     4300004: pPlane4
@@ -192,6 +200,8 @@ ModelImporter:
     4300032: pPlane11
     4300034: polySurface47
     4300036: polySurface51
+    4300038: pPlane12
+    4300040: pCube2
     9500000: //RootNode
   materials:
     importMaterials: 1
