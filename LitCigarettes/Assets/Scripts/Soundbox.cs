@@ -24,7 +24,6 @@ public class Soundbox : MonoBehaviour {
 			if(!soundPlayed)
 			{
 				PlaySound(0,1f);
-				soundPlayed = true;
 			}
 		}
 	}
@@ -34,5 +33,6 @@ public class Soundbox : MonoBehaviour {
 		sounder.volume = volume;
 		sounder.clip = sounds[index];
 		sounder.Play();
+		soundPlayed = true;
 	}
 }
