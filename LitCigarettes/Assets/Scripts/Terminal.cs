@@ -16,7 +16,7 @@ public class Terminal : MonoBehaviour {
 		GameObject hudPlane;
 		GameObject player;
 		GameObject screenGlow;
-		public GameObject target;
+		public GameObject[] target;
 	
 	// Use this for initialization
 	void Start () 
@@ -48,26 +48,34 @@ public class Terminal : MonoBehaviour {
 			hudPlane.SetActive(false);
 	}
 	
+	void MessageTargets(string function)
+	{
+		for(int i = 0;i<target.Length;i++)
+			target[i].SendMessage(function);
+	}
+	
 	IEnumerator Activate(float waitTime)
 	{
-		PlaySound(0,.9f);
+		PlaySound(0,.6f);
 		yield return new WaitForSeconds(waitTime);
 		renderer.material.SetTexture("_MainTex",activated[0]);
 		renderer.material.SetTexture("_Detail",activated[1]);
 		hudPlane.renderer.material.SetTexture("_MainTex",hud[0]);
 		screenGlow.light.color = glowColor[0];
+		MessageTargets("Activate");
 		isActive = true;
 		soundPlaying=false;
 	}
 	
 	IEnumerator Deactivate(float waitTime)
 	{
-		PlaySound(1,.75f);
+		PlaySound(1,.5f);
 		yield return new WaitForSeconds(waitTime);
 		renderer.material.SetTexture("_MainTex",deactivated[0]);
 		renderer.material.SetTexture("_Detail",deactivated[1]);
 		hudPlane.renderer.material.SetTexture("_MainTex",hud[1]);
 		screenGlow.light.color = glowColor[1];
+		MessageTargets("Deactivate");
 		isActive = false;
 		soundPlaying=false;
 	}
