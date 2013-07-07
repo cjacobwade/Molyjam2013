@@ -11,6 +11,8 @@ public class Player : MonoBehaviour {
 		public float gravitySpeed;
 		//Jumping
 			public int jumpSpeed;
+			public float maxJump;
+			public float jumpTime;
 			bool isJumping = false;
 		//Crouching
 			public float crouchSpeed;
@@ -18,8 +20,14 @@ public class Player : MonoBehaviour {
 			public float crouchHeight;
 			float controllerHeight;
 			bool isCrouching = false;
+		//Death
+			bool brighten = false;
+			public float deathHeight;
+			public int deathRotateSpeed;
+	
 	//Camera Control
 		public int rotateSpeed;
+		public float shakeStrength;
 		//Up/Down
 			public float cameraV;//how much are we currently rotating (private)
 			float cameraRotationV;
@@ -27,8 +35,11 @@ public class Player : MonoBehaviour {
 			public float maxCameraV;
 		//Left/Right
 			public float cameraH;	
+	//Audio
+		public AudioClip[] sounds;
 	
 	//GameObjects
+		public GameObject view;
 		public GameObject model;
 	
 	// Use this for initialization
@@ -70,8 +81,8 @@ public class Player : MonoBehaviour {
 	void CameraHorizontal()
 	{
 		cameraH = Input.GetAxis("Mouse X");
-		transform.Rotate(new Vector3(0,Time.deltaTime*cameraH*rotateSpeed,0));
-		transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x,transform.rotation.eulerAngles.y,0);
+		view.transform.Rotate(new Vector3(0,Time.deltaTime*cameraH*rotateSpeed,0));
+		view.transform.rotation = Quaternion.Euler(view.transform.rotation.eulerAngles.x,view.transform.rotation.eulerAngles.y,0);
 	}
 	
 	void CameraVertical()
@@ -86,64 +97,103 @@ public class Player : MonoBehaviour {
 		if(cameraRotationV >= minCameraV && cameraRotationV <= maxCameraV)
 		{
 			cameraRotationV += cameraV;
-			transform.Rotate(new Vector3(Time.deltaTime*cameraV*-rotateSpeed/*change this to positive for reversed axis*/,0,0));
+			view.transform.Rotate(new Vector3(Time.deltaTime*cameraV*-rotateSpeed/*change this to positive for reversed axis*/,0,0));
 		}
 		if(cameraRotationV < minCameraV)//if lower than min rotation, correct
 		{
 			cameraRotationV += 1;
-			transform.Rotate(new Vector3(Time.deltaTime*cameraV*-rotateSpeed,0,0));
+			view.transform.Rotate(new Vector3(Time.deltaTime*cameraV*-rotateSpeed,0,0));
 		}
 		if(cameraRotationV > maxCameraV)//if higher than max rotation, correct
 		{
 			cameraRotationV -= 1;
-			transform.Rotate(new Vector3(Time.deltaTime*cameraV*-rotateSpeed,0,0));
+			view.transform.Rotate(new Vector3(Time.deltaTime*cameraV*-rotateSpeed,0,0));
 		}	
 	}
 	
 	void Movement()
 	{
+		view.transform.position = transform.position;
 		//Horizontal and Vertical axis are controlled by wasd or arrows
 		moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0,Input.GetAxis("Vertical"));
-        moveDirection = transform.TransformDirection(moveDirection);
+        moveDirection = view.transform.TransformDirection(new Vector3(moveDirection.x,transform.eulerAngles.y, moveDirection.z));
 		if(isCrouching)
 			moveDirection *= crouchMoveSpeed;
 		else
         	moveDirection *= moveSpeed;	
 		moveDirection = new Vector3(moveDirection.x,ySpeed,moveDirection.z);
-		if(Input.GetAxis("Vertical") > 0 || Input.GetAxis("Horizontal") != 0)
+		if(Input.GetAxis("Vertical") != 0 || Input.GetAxis("Horizontal") != 0)
 		{
 			if(!model.animation["Throw"].enabled && !isJumping)
 			{
 				if(isCrouching)
-					PlayAnimation("Walk",.2f);
+				{
+					if(!audio.isPlaying)
+						PlaySound(1,.6f);
+				}
 				else
-					PlayAnimation("Walk",.4f);
+				{
+					if(!audio.isPlaying)
+						PlaySound(0,.6f);
+				}
 			}
-			else
-				model.animation.Stop("Walk");
 		}
 		else
 		{
+			audio.Stop();
 			if(!model.animation["Throw"].enabled)
 				PlayAnimation("Idle",1);
 		}
 		if(controller.isGrounded)
 		{
+			jumpTime = 0;
 			isJumping = false;
 			Jump();
 			Crouch();
 		}
 		else
 		{
+			Dying();
 			if(ySpeed > -9.8)
 				ySpeed += gravitySpeed;
 		}
+	}
+	
+	void Dying()
+	{
+		if(jumpTime < maxJump)
+			jumpTime += 1*Time.deltaTime;
+		else
+		{
+			
+			moveDirection *= 0;
+			rotateSpeed = deathRotateSpeed;
+			if(controller.height > deathHeight)
+				controller.height -= crouchSpeed*Time.deltaTime;
+			if(!brighten)
+			{
+				view.transform.Translate(Random.Range(-shakeStrength, shakeStrength)*3,Random.Range(-shakeStrength, shakeStrength)*2,0);
+				StartCoroutine(Death(5));
+				view.light.range += .2f;
+				view.light.intensity += .1f;
+			}
+			
+		}
+	}
+	
+	IEnumerator Death(float waitTime)
+	{
+		yield return new WaitForSeconds(waitTime);
+		brighten = true;
+		yield return new WaitForSeconds(waitTime*.3f);
+		Application.LoadLevel(Application.loadedLevel);
 	}
 	
 	void Jump()
 	{
 		if(Input.GetButton("Jump"))
 		{
+			audio.Stop();
 			//isCrouching = false;
 			isJumping = true;
 			ySpeed = 0;
@@ -174,5 +224,12 @@ public class Player : MonoBehaviour {
 	{
 		model.animation[name].speed = speed;
 		model.animation.Play(name);
+	}
+	
+	void PlaySound(int index, float volume)
+	{
+		audio.volume = volume;
+		audio.clip = sounds[index];
+		audio.Play();
 	}
 }

@@ -14,14 +14,13 @@ public class Terminal : MonoBehaviour {
 	
 	//Object refs
 		GameObject hudPlane;
-		GameObject player;
+		public GameObject player;
 		GameObject screenGlow;
 		public GameObject[] target;
 	
 	// Use this for initialization
 	void Start () 
 	{
-		player = GameObject.Find("Player");
 		hudPlane = GameObject.Find("HUD");
 		screenGlow = GameObject.Find("Screenglow");
 	}
@@ -56,7 +55,7 @@ public class Terminal : MonoBehaviour {
 	
 	IEnumerator Activate(float waitTime)
 	{
-		PlaySound(0,.6f);
+		PlaySound(0,.3f);
 		yield return new WaitForSeconds(waitTime);
 		renderer.material.SetTexture("_MainTex",activated[0]);
 		renderer.material.SetTexture("_Detail",activated[1]);
@@ -69,7 +68,7 @@ public class Terminal : MonoBehaviour {
 	
 	IEnumerator Deactivate(float waitTime)
 	{
-		PlaySound(1,.5f);
+		PlaySound(1,.05f);
 		yield return new WaitForSeconds(waitTime);
 		renderer.material.SetTexture("_MainTex",deactivated[0]);
 		renderer.material.SetTexture("_Detail",deactivated[1]);
