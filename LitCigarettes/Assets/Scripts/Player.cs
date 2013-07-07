@@ -175,7 +175,7 @@ public class Player : MonoBehaviour {
 		}
 		else
 		{
-			if(audio.clip != sounds[2])
+			if(audio.clip != sounds[2]&&audio.clip != sounds[3])
 				audio.Stop();
 		}
 	}
@@ -189,8 +189,10 @@ public class Player : MonoBehaviour {
 		}
 		else
 		{
-			
-			moveDirection *= 0;
+			if(!audio.isPlaying)
+					PlaySound(3,.5f);
+			moveDirection.x *= 0;
+			moveDirection.z *= 0;
 			rotateSpeed = deathRotateSpeed;
 			if(controller.height > deathHeight)
 				controller.height -= crouchSpeed*Time.deltaTime;
@@ -201,7 +203,6 @@ public class Player : MonoBehaviour {
 				view.light.range += .2f;
 				view.light.intensity += .1f;
 			}
-			
 		}
 	}
 	
