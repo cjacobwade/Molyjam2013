@@ -9,6 +9,7 @@ public class Player : MonoBehaviour {
 		public int moveSpeed;
 		public float ySpeed;//private
 		public float gravitySpeed;
+		bool isMoving = false;
 		//Jumping
 			public int jumpSpeed;
 			public float maxJump;
@@ -122,9 +123,32 @@ public class Player : MonoBehaviour {
 		else
         	moveDirection *= moveSpeed;	
 		moveDirection = new Vector3(moveDirection.x,ySpeed,moveDirection.z);
+		SoundControl();
+		if(controller.isGrounded)
+		{
+			if(isJumping)
+			{
+				if(!audio.isPlaying)
+					PlaySound(2,.7f);
+			}
+			jumpTime = 0;
+			isJumping = false;
+			Jump();
+			Crouch();
+		}
+		else
+		{
+			Dying();
+			if(ySpeed > -9.8)
+				ySpeed += gravitySpeed;
+		}
+	}
+	
+	void SoundControl()
+	{
 		if(Input.GetAxis("Vertical") != 0 || Input.GetAxis("Horizontal") != 0)
 		{
-			if(!model.animation["Throw"].enabled && !isJumping)
+			if(!isJumping)
 			{
 				if(isCrouching)
 				{
@@ -139,24 +163,8 @@ public class Player : MonoBehaviour {
 			}
 		}
 		else
-		{
-			audio.Stop();
-			if(!model.animation["Throw"].enabled)
-				PlayAnimation("Idle",1);
-		}
-		if(controller.isGrounded)
-		{
-			jumpTime = 0;
-			isJumping = false;
-			Jump();
-			Crouch();
-		}
-		else
-		{
-			Dying();
-			if(ySpeed > -9.8)
-				ySpeed += gravitySpeed;
-		}
+			if(audio.clip.name != "Landing")
+				audio.Stop();
 	}
 	
 	void Dying()
