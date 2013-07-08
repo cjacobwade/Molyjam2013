@@ -24,7 +24,7 @@ public class Player : MonoBehaviour {
 			public float crouchMoveSpeed;
 			public float crouchHeight;
 			float controllerHeight;
-			bool isCrouching = false;
+			public bool isCrouching = false;
 		//Death
 			bool brighten = false;
 			public float deathHeight;
@@ -52,7 +52,10 @@ public class Player : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
+		
+		Screen.lockCursor = true;
 		controller = GetComponent<CharacterController>();
+		controllerHeight = controller.height;
 	}
 	
 	// Update is called once per frame
@@ -79,14 +82,15 @@ public class Player : MonoBehaviour {
 	{
 		if(Input.GetMouseButton(0))
 		{
+			Screen.lockCursor = true;
+			Screen.showCursor = false;
 			if(throwReady)
 			{
 				PlayAnimation("Throw",1.3f);
 				StartCoroutine(Throw(throwTime,reloadTime));
 				throwReady = false;
 			}
-			Screen.lockCursor = true;
-			Screen.showCursor = false;
+			
 		}
 	}
 	
@@ -230,10 +234,26 @@ public class Player : MonoBehaviour {
 		}
 		if(!Input.GetKey(KeyCode.LeftShift) && isCrouching)
 		{
-			ySpeed = 0;
-			ySpeed += jumpSpeed/1.7f;
-			controller.height = 1.7f;
-			isCrouching = false;
+			Debug.DrawRay(transform.position,Vector3.up,Color.red);
+			
+			//if((controller.collisionFlags & CollisionFlags.Above) == 0)
+			//if(!Physics.Raycast(transform.position,Vector3.up,3))
+			//if(!Physics.CapsuleCast(transform.position,transform.position + new Vector3(0, .5f,0),.4f,Vector3.up,2))
+			if(!Physics.SphereCast(new Ray(transform.position,Vector3.up),.4f,1))
+			{
+				print("No Overhead");
+				if(controller.height < controllerHeight)
+				{
+					ySpeed = 0;
+					ySpeed += jumpSpeed/1.7f;
+					controller.height = 1.7f;
+					//ySpeed +=crouchSpeed*Time.deltaTime;
+					//controller.height += crouchSpeed*Time.deltaTime;
+				}
+				else
+					
+					isCrouching = false;
+			}
 		}
 	}
 	

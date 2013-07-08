@@ -3,6 +3,7 @@ using System.Collections;
 
 public class Spike : MonoBehaviour {
 	
+	public AudioClip[] sounds;
 	public GameObject tailLight;
 	public float brightTime;//how long till the lights start to dim
 	public float dimRate;
@@ -29,6 +30,7 @@ public class Spike : MonoBehaviour {
 	
 	void OnCollisionEnter()
 	{
+		PlaySound(0,1);
 		StartCoroutine(Dimmer(brightTime));
 	}
 	
@@ -37,5 +39,12 @@ public class Spike : MonoBehaviour {
 		rigidbody.isKinematic = true;
 		yield return new WaitForSeconds(waitTime);
 		isDimming = true;
+	}
+	
+	void PlaySound(int index, float volume)
+	{
+		audio.volume = volume;
+		audio.clip = sounds[index];
+		audio.Play();
 	}
 }
