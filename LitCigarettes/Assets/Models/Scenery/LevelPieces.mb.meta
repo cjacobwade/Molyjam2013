@@ -83,6 +83,7 @@ ModelImporter:
     100154: polySurface66
     100156: polySurface67
     100158: polySurface68
+    100160: polySurface69
     400000: //RootNode
     400002: pCylinder1
     400004: pCylinder2
@@ -163,6 +164,7 @@ ModelImporter:
     400154: polySurface66
     400156: polySurface67
     400158: polySurface68
+    400160: polySurface69
     2300000: pCylinder1
     2300002: pCylinder2
     2300004: polySurface11
@@ -194,6 +196,7 @@ ModelImporter:
     2300056: polySurface62
     2300058: polySurface67
     2300060: polySurface68
+    2300062: polySurface69
     3300000: pCylinder1
     3300002: pCylinder2
     3300004: polySurface11
@@ -225,6 +228,7 @@ ModelImporter:
     3300056: polySurface62
     3300058: polySurface67
     3300060: polySurface68
+    3300062: polySurface69
     4300000: pPlane1
     4300002: pPlane2
     4300004: pPlane4
@@ -256,6 +260,7 @@ ModelImporter:
     4300056: polySurface62
     4300058: polySurface67
     4300060: polySurface68
+    4300062: polySurface69
     9500000: //RootNode
   materials:
     importMaterials: 1
